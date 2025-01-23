@@ -18,16 +18,17 @@ const ActuCards = () => {
       })
       .then((data) => {
         console.log("Données récupérées :", data); // Affiche les données récupérées
+
         if (data && data.data && Array.isArray(data.data)) {
           const formattedPosts = data.data.map((post) => ({
             id: post.id,
-            titre: post.attributes.titre || "Titre non défini",
+            titre: post.attributes?.titre || "Titre non défini", // Chaînage sécurisé
             description:
-              post.attributes.description || "Description non définie",
-            date: post.attributes.date || null,
-            imageUrl: post.attributes.images?.data?.[0]?.attributes?.url
+              post.attributes?.description || "Description non définie", // Chaînage sécurisé
+            date: post.attributes?.date || null, // Chaînage sécurisé
+            imageUrl: post.attributes?.images?.data?.[0]?.attributes?.url
               ? `https://as-coudeville.onrender.com${post.attributes.images.data[0].attributes.url}`
-              : null,
+              : null, // Vérifie que l'URL de l'image existe
           }));
           setPosts(formattedPosts);
         } else {
@@ -56,10 +57,12 @@ const ActuCards = () => {
     setExpandedPost(null); // Ferme la carte agrandie
   };
 
+  // Gestion des erreurs
   if (error) {
     return <p>Erreur : {error}</p>;
   }
 
+  // Vérifie si les posts sont disponibles
   if (!posts.length) {
     return <p>Chargement en cours ou aucun article trouvé.</p>;
   }

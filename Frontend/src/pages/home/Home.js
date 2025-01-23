@@ -23,7 +23,7 @@ const Home = () => {
     });
 
     // Récupérer les actualités depuis l'API déployée sur Render
-    fetch("https://as-coudeville.onrender.com/api/news") // Nouvelle URL correcte
+    fetch("https://as-coudeville.onrender.com/api/news?populate=images") // Ajout du paramètre pour récupérer les images
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Erreur HTTP : ${response.status}`);
@@ -32,21 +32,23 @@ const Home = () => {
       })
       .then((data) => {
         if (data && data.data) {
-          // Trier les actualités par date décroissante
+          // Formatage des actualités avec les images et autres informations
           const sortedActualites = data.data
             .map((item) => ({
               id: item.id,
-              titre: item.titre,
-              description: item.description,
-              date: item.date,
-              imageUrl: item.imageUrl || "", // Vérifie si une image est présente
+              titre: item.attributes.titre,
+              description: item.attributes.description,
+              date: item.attributes.date,
+              imageUrl: item.attributes.images?.data?.[0]?.attributes?.url
+                ? `https://as-coudeville.onrender.com${item.attributes.images.data[0].attributes.url}`
+                : "", // Si pas d'image, on laisse une chaîne vide
             }))
-            .sort((a, b) => new Date(b.date) - new Date(a.date));
+            .sort((a, b) => new Date(b.date) - new Date(a.date)); // Trie par date décroissante
 
           // Limiter à 4 actualités les plus récentes
           const limitedActualites = sortedActualites.slice(0, 4);
 
-          setActualites(limitedActualites);
+          setActualites(limitedActualites); // Mettre à jour les actualités
         } else {
           setActualites([]);
         }
@@ -56,7 +58,7 @@ const Home = () => {
         setError("Impossible de charger les actualités. Veuillez réessayer.");
       })
       .finally(() => {
-        setLoading(false);
+        setLoading(false); // Terminer le chargement
       });
   }, []); // L'appel API s'effectue seulement au montage du composant
 

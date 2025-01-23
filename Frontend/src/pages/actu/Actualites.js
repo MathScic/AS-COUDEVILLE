@@ -12,7 +12,7 @@ const Actualites = () => {
     const fetchActualites = async () => {
       try {
         const response = await fetch(
-          "https://as-coudeville.onrender.com/api/news"
+          "https://as-coudeville.onrender.com/api/news?populate=images" // Ajoute `populate=images` pour récupérer les images
         );
         if (!response.ok) {
           throw new Error(`Erreur HTTP : ${response.status}`);
@@ -23,10 +23,13 @@ const Actualites = () => {
         // Récupérer les actualités depuis "data"
         const actualitesData = result.data.map((item) => ({
           id: item.id,
-          titre: item.titre,
-          description: item.description,
-          date: item.date, // Assurez-vous que "date" est bien utilisé ou remplacez par une autre logique
-          createdAt: item.createdAt,
+          titre: item.attributes.titre,
+          description: item.attributes.description,
+          date: item.attributes.date,
+          createdAt: item.attributes.createdAt,
+          imageUrl: item.attributes.images?.data?.[0]?.attributes?.url
+            ? `https://as-coudeville.onrender.com${item.attributes.images.data[0].attributes.url}`
+            : null, // Récupérer l'URL de l'image
         }));
 
         // Trier par date de création (createdAt)
