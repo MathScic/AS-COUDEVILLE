@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import "./ActuCards.scss"; // Assurez-vous d'importer le fichier SCSS
 
 const ActuCards = () => {
-  const [posts, setPosts] = useState(null); // Articles récupérés
+  const [posts, setPosts] = useState([]); // Articles récupérés
   const [error, setError] = useState(null); // Gestion des erreurs
   const [expandedPost, setExpandedPost] = useState(null); // État pour la carte agrandie
-  const [showMore, setShowMore] = useState(false); // Pour gérer l'affichage de la 5ème carte
+  const [visibleCount, setVisibleCount] = useState(4); // Nombre de cartes visibles par défaut
 
   useEffect(() => {
-    // Appel à l'API Strapi avec la nouvelle route 'news'
-    fetch("http://localhost:1337/api/news?populate=images")
+    // Appel à l'API Strapi avec la bonne URL
+    fetch("https://as-coudeville.onrender.com/api/news?populate=images")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Erreur HTTP ! Status : ${response.status}`);
@@ -19,9 +19,19 @@ const ActuCards = () => {
       .then((data) => {
         console.log("Données récupérées :", data); // Affiche les données récupérées
         if (data && data.data && Array.isArray(data.data)) {
-          setPosts(data.data); // Stocke directement le tableau des articles
+          const formattedPosts = data.data.map((post) => ({
+            id: post.id,
+            titre: post.attributes.titre || "Titre non défini",
+            description:
+              post.attributes.description || "Description non définie",
+            date: post.attributes.date || null,
+            imageUrl: post.attributes.images?.data?.[0]?.attributes?.url
+              ? `https://as-coudeville.onrender.com${post.attributes.images.data[0].attributes.url}`
+              : null,
+          }));
+          setPosts(formattedPosts);
         } else {
-          setPosts([]); // Sinon, on met un tableau vide
+          setPosts([]); // Si aucune donnée, tableau vide
         }
       })
       .catch((error) => {
@@ -29,6 +39,14 @@ const ActuCards = () => {
         setError(error.message);
       });
   }, []);
+
+  const handleShowMore = () => {
+    setVisibleCount((prevCount) => prevCount + 1); // Augmente le nombre visible
+  };
+
+  const handleShowLess = () => {
+    setVisibleCount(4); // Réinitialise à 4 cartes
+  };
 
   const handleCardClick = (post) => {
     setExpandedPost(post); // Affiche la carte agrandie
@@ -38,92 +56,52 @@ const ActuCards = () => {
     setExpandedPost(null); // Ferme la carte agrandie
   };
 
-  const handleShowMoreClick = () => {
-    setShowMore(true); // Affiche la 5ème carte
-  };
-
-  const handleShowLessClick = () => {
-    setShowMore(false); // Retourne à l'affichage des 4 premières cartes
-  };
-
   if (error) {
     return <p>Erreur : {error}</p>;
   }
 
-  if (!posts || !Array.isArray(posts)) {
+  if (!posts.length) {
     return <p>Chargement en cours ou aucun article trouvé.</p>;
   }
 
   return (
     <div className="actu-cards">
       <div className="cards">
-        {posts.slice(0, 4).map((post) => {
-          const { id, titre, description, date, images } = post; // Extraction des champs nécessaires
-
-          console.log(images); // Affiche les données des images
-
-          // Vérification si l'image est présente et obtention de l'URL complète
-          const imageUrl =
-            images && images.length > 0
-              ? `http://localhost:1337${images[0].url}`
-              : null;
-
-          return (
-            <div
-              key={id}
-              className="card-container"
-              onClick={() => handleCardClick(post)} // Ajoute un événement de clic sur chaque carte
-            >
-              {imageUrl ? (
-                <img
-                  src={imageUrl}
-                  alt={titre || "Image"}
-                  className="card-image"
-                />
-              ) : (
-                <p style={{ color: 'red' }}>Erreur : Image non disponible</p>
-              )}
-              <h2>{titre || "Titre non défini"}</h2>
-              <p>{description || "Description non définie"}</p>
-              <div className="card-date">
-                {date
-                  ? new Date(date).toLocaleDateString()
-                  : "Date non définie"}
-              </div>
-            </div>
-          );
-        })}
-
-        {/* Affiche la 5ème carte si le bouton "Voir plus" est cliqué */}
-        {showMore && posts.length >= 5 && (
-          <div className="card-container">
-            {posts[4].images && posts[4].images.length > 0 ? (
+        {posts.slice(0, visibleCount).map((post) => (
+          <div
+            key={post.id}
+            className="card-container"
+            onClick={() => handleCardClick(post)} // Ajoute un événement de clic sur chaque carte
+          >
+            {post.imageUrl ? (
               <img
-                src={`http://localhost:1337${posts[4].images[0].url}`}
-                alt={posts[4].titre}
+                src={post.imageUrl}
+                alt={post.titre}
                 className="card-image"
               />
             ) : (
-              <p style={{ color: 'red' }}>Erreur : Image non disponible</p>
+              <p style={{ color: "red" }}>Erreur : Image non disponible</p>
             )}
-            <h2>{posts[4].titre || "Titre non défini"}</h2>
-            <p>{posts[4].description || "Description non définie"}</p>
+            <h2>{post.titre}</h2>
+            <p>{post.description}</p>
             <div className="card-date">
-              {posts[4].date
-                ? new Date(posts[4].date).toLocaleDateString()
+              {post.date
+                ? new Date(post.date).toLocaleDateString()
                 : "Date non définie"}
             </div>
           </div>
-        )}
+        ))}
       </div>
 
       {/* Bouton pour voir plus ou moins */}
-      {posts.length > 4 && (
-        <button
-          className="showmore-btn"
-          onClick={showMore ? handleShowLessClick : handleShowMoreClick}
-        >
-          {showMore ? "Voir moins" : "Voir plus"}
+      {posts.length > visibleCount && (
+        <button className="showmore-btn" onClick={handleShowMore}>
+          Voir plus
+        </button>
+      )}
+      {visibleCount > 4 && (
+        <button className="showmore-btn" onClick={handleShowLess}>
+          Voir moins
         </button>
       )}
 
@@ -135,14 +113,14 @@ const ActuCards = () => {
             onClick={(e) => e.stopPropagation()} // Empêche la propagation du clic sur la card
           >
             {/* Image agrandie */}
-            {expandedPost.images && expandedPost.images.length > 0 ? (
+            {expandedPost.imageUrl ? (
               <img
-                src={`http://localhost:1337${expandedPost.images[0].url}`}
+                src={expandedPost.imageUrl}
                 alt={expandedPost.titre}
                 className="expanded-card-image"
               />
             ) : (
-              <p style={{ color: 'red' }}>Erreur : Image non disponible</p>
+              <p style={{ color: "red" }}>Erreur : Image non disponible</p>
             )}
 
             <h2>{expandedPost.titre}</h2>

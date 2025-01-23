@@ -12,6 +12,7 @@ import "aos/dist/aos.css";
 const Home = () => {
   const [actualites, setActualites] = useState([]); // Liste des actualités
   const [loading, setLoading] = useState(true); // État de chargement
+  const [error, setError] = useState(null); // État pour gérer les erreurs
 
   useEffect(() => {
     // Initialisation d'AOS pour gérer les animations
@@ -21,19 +22,24 @@ const Home = () => {
       offset: 150, // Décalage pour déclencher l'animation au scroll
     });
 
-    // Récupérer les actualités depuis l'API
-    fetch("http://localhost:1337/api/news") // Remplace l'URL par celle de ton CMS
-      .then((response) => response.json())
+    // Récupérer les actualités depuis l'API déployée sur Render
+    fetch("https://as-coudeville.onrender.com/api/news") // Nouvelle URL correcte
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP : ${response.status}`);
+        }
+        return response.json();
+      })
       .then((data) => {
         if (data && data.data) {
           // Trier les actualités par date décroissante
           const sortedActualites = data.data
             .map((item) => ({
               id: item.id,
-              titre: item.attributes.titre,
-              description: item.attributes.description,
-              date: item.attributes.date,
-              imageUrl: item.attributes.images?.[0]?.url || "", // Vérifie si l'image existe
+              titre: item.titre,
+              description: item.description,
+              date: item.date,
+              imageUrl: item.imageUrl || "", // Vérifie si une image est présente
             }))
             .sort((a, b) => new Date(b.date) - new Date(a.date));
 
@@ -41,17 +47,25 @@ const Home = () => {
           const limitedActualites = sortedActualites.slice(0, 4);
 
           setActualites(limitedActualites);
-          setLoading(false);
+        } else {
+          setActualites([]);
         }
       })
       .catch((error) => {
         console.error("Erreur lors de la récupération des actualités :", error);
+        setError("Impossible de charger les actualités. Veuillez réessayer.");
+      })
+      .finally(() => {
         setLoading(false);
       });
   }, []); // L'appel API s'effectue seulement au montage du composant
 
   if (loading) {
     return <div>Chargement...</div>;
+  }
+
+  if (error) {
+    return <div className="error">{error}</div>; // Affichage du message d'erreur
   }
 
   return (

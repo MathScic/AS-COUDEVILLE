@@ -12,24 +12,37 @@ const Actualites = () => {
     const fetchActualites = async () => {
       try {
         const response = await fetch(
-          "http://localhost:1337/api/news"
-        ); // Remplace l'URL par celle de ton CMS
-        const data = await response.json();
+          "https://as-coudeville.onrender.com/api/news"
+        );
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP : ${response.status}`);
+        }
 
-        // Trier les actualités par date (de la plus récente à la plus ancienne)
-        const sortedActualites = data.actualites.sort(
-          (a, b) => new Date(b.date) - new Date(a.date)
+        const result = await response.json();
+
+        // Récupérer les actualités depuis "data"
+        const actualitesData = result.data.map((item) => ({
+          id: item.id,
+          titre: item.titre,
+          description: item.description,
+          date: item.date, // Assurez-vous que "date" est bien utilisé ou remplacez par une autre logique
+          createdAt: item.createdAt,
+        }));
+
+        // Trier par date de création (createdAt)
+        const sortedActualites = actualitesData.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
 
-        setActualites(sortedActualites); // On met à jour les actualités
-        setLoading(false); // Fin du chargement
+        setActualites(sortedActualites); // Mettre à jour l'état avec les actualités triées
       } catch (error) {
-        console.error("Erreur de récupération des actualités", error);
-        setLoading(false); // Fin du chargement
+        console.error("Erreur lors du chargement des actualités :", error);
+      } finally {
+        setLoading(false); // Terminer le chargement
       }
     };
 
-    fetchActualites(); // Récupérer les actualités depuis l'API
+    fetchActualites();
   }, []);
 
   // Fonction pour afficher plus de cartes
@@ -59,10 +72,10 @@ const Actualites = () => {
       </p>
       <div className="content">
         <div className="actu-cards-container">
-          {/* Afficher les cartes sélectionnées */}
+          {/* Passer les actualités triées au composant ActuCards */}
           <ActuCards actualites={actualitesToDisplay} />
 
-          {/* Affichage du bouton Voir plus/voir moins */}
+          {/* Boutons pour afficher plus ou moins */}
           {actualites.length > 4 && (
             <div className="voir-plus-button">
               {visibleCount > 4 ? (
