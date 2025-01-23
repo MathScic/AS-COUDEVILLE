@@ -8,8 +8,8 @@ const ActuCards = () => {
   const [showMore, setShowMore] = useState(false); // Pour gérer l'affichage de la 5ème carte
 
   useEffect(() => {
-    // Appel à l'API Strapi avec 'populate' pour charger les images
-    fetch("http://localhost:1337/api/news-actus?populate=images")
+    // Appel à l'API Strapi avec la nouvelle route 'news'
+    fetch("http://localhost:1337/api/news?populate=images")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Erreur HTTP ! Status : ${response.status}`);

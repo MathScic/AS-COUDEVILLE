@@ -10,8 +10,8 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 
 const Home = () => {
-  const [actualites, setActualites] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [actualites, setActualites] = useState([]); // Liste des actualités
+  const [loading, setLoading] = useState(true); // État de chargement
 
   useEffect(() => {
     // Initialisation d'AOS pour gérer les animations
@@ -21,8 +21,8 @@ const Home = () => {
       offset: 150, // Décalage pour déclencher l'animation au scroll
     });
 
-    // Récupérer les actualités depuis le CMS
-    fetch("http://localhost:1337/api/news-actus?populate=*") // Remplace l'URL par celle de ton CMS
+    // Récupérer les actualités depuis l'API
+    fetch("http://localhost:1337/api/news?populate=*") // Remplace l'URL par celle de ton CMS
       .then((response) => response.json())
       .then((data) => {
         if (data && data.data) {
@@ -48,7 +48,7 @@ const Home = () => {
         console.error("Erreur lors de la récupération des actualités :", error);
         setLoading(false);
       });
-  }, []);
+  }, []); // L'appel API s'effectue seulement au montage du composant
 
   if (loading) {
     return <div>Chargement...</div>;
@@ -73,7 +73,7 @@ const Home = () => {
         <h1>Les Actu's</h1>
         <div className="actu-form">
           <div className="compo-actu">
-            {/* Passer les 4 actualités à ActuCards */}
+            {/* Passer les actualités récupérées à ActuCards */}
             <ActuCards actualites={actualites} />
           </div>
           <div className="class-actu">

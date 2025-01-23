@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "public": "Frontend/build",
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "destination": "https://your-strapi-api-url.com/api/**"
+      }
+    ]
+  }
+}
