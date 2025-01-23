@@ -1,0 +1,59 @@
+.home-container {
+  .actualite-home {
+    width: 100%;
+    height: auto;
+    margin: auto;
+    text-align: center;
+    background-color: #f9f9f9;
+    margin-top: 2rem;
+    margin-top: 0;
+
+    h2 {
+      margin: 0;
+      padding-top: 1rem;
+    }
+  }
+
+  .compo-actu {
+    width: 70%;
+  }
+
+  .compo-actu .showmore-btn {
+    display: none;
+  }
+
+  .actu-form {
+    display: flex;
+  }
+
+  .home-links {
+    text-decoration: none;
+    color: black;
+
+    h3 {
+      padding-bottom: 2rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .home-container {
+    flex-direction: column;
+  }
+  .actualite-home {
+    h1 {
+      font-size: 1.5em;
+    }
+    .actu-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+}
+
+@media (max-width: 2014px) {
+  .home-container {
+    max-width: 100%;
+  }
+}

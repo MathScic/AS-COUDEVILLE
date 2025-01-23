@@ -1,0 +1,26 @@
+.footer {
+  background: #333;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #000f2f;
+
+  &.fixed-footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+  }
+
+  &.relative-footer {
+    position: relative;
+    bottom: auto;
+    width: auto;
+  }
+}
+
+@media (max-width: 425px) {
+  .footer {
+    width: 100%;
+  }
+}

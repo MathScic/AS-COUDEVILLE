@@ -1,0 +1,19 @@
+// Reset de base pour s'assurer d'un rendu propre
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%; // Permet de travailler avec 100vh dans l'application
+}
+
+.app-wrapper {
+  display: flex;
+  flex-direction: column; // Structure verticale : Navbar > Contenu > Footer
+  min-height: 100vh; // Assure que le wrapper couvre toute la hauteur de l'écran
+}
+
+.content {
+  flex: 1; // Pousse le footer vers le bas si le contenu est insuffisant
+  background-color: #f4f4f4;
+  margin-bottom: 3rem; // Couleur de fond optionnelle
+}

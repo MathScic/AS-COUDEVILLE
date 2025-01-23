@@ -1,0 +1,13 @@
+@media (max-width: 768px) {
+    body {
+      overflow-x: hidden;
+    }
+    .contact-container {
+      padding: 10px;
+      flex-direction: column;
+      width: 80%;
+      margin-top: 2rem;
+      margin: auto;
+      padding: 0;
+    }
+  }

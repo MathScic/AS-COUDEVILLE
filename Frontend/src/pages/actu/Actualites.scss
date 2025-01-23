@@ -1,0 +1,70 @@
+body {
+  overflow-x: hidden;
+}
+
+.actualites-container {
+  margin: 0;
+  padding: 0;
+}
+
+.actualites-container {
+  margin-top: 6rem;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 1rem;
+}
+
+p {
+  margin-bottom: 2rem;
+}
+
+.content {
+  display: flex;
+  justify-content: space-between; /* Espace entre les deux éléments */
+  gap: 2rem;
+  flex-wrap: wrap; /* Permet au contenu de se réorganiser sur des écrans plus petits */
+}
+
+.actu-cards-container {
+  flex: 2; /* Donne 2 parts sur 3 à ActuCards */
+  min-width: 400px; /* Taille minimale */
+}
+
+.classement-container iframe {
+  flex: 1; /* Donne 1 part sur 3 au classement */
+  min-width: 350px; /* Taille minimale */
+  max-width: 400px; /* Limite la largeur max du classement */
+  height: 650px; /* S'assure que le classement occupe toute la hauteur */
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.voir-plus-btn {
+  border: none;
+  font-size: 17px;
+  color: #2cc0ff;
+  padding-bottom: 2rem;
+}
+
+.voir-plus-btn:hover {
+  color: #ffe100;
+  cursor: pointer;
+}
+
+/* Assurer que les éléments dans les deux colonnes s'ajustent bien */
+@media (max-width: 768px) {
+  .content {
+    flex-direction: column; /* Sur les petits écrans, empile les éléments */
+    align-items: center; /* Centre les éléments */
+  }
+
+  .actu-cards-container,
+  .classement-container {
+    flex: 1 100%; /* Les éléments prennent toute la largeur disponible */
+    min-width: auto; /* Permet d'ajuster la largeur sur petits écrans */
+  }
+}

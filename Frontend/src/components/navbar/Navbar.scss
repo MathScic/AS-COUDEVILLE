@@ -1,0 +1,123 @@
+.navbar-container {
+  position: fixed; // Pour rester visible pendant le défilement
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 10;
+
+  &.transparent {
+    background-color: transparent;
+    transition: background-color 0.3s ease; // Transition fluide
+  }
+
+  &.opaque {
+    background-color: #000f2f; // Couleur de fond pour les autres pages
+    transition: background-color 0.3s ease;
+  }
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.burger-icon {
+  cursor: pointer;
+  color: white;
+  font-size: 30px;
+  z-index: 15;
+  display: none; // Caché par défaut sur les écrans plus larges
+  position: absolute; // Fixe sa position
+  right: 20px; // Le burger se positionne à droite
+  top: 15px; // Distance du bord supérieur
+}
+
+.navbar-links-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: static;
+  z-index: 14;
+}
+
+.navbar-links {
+  color: #fff;
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: bold;
+
+  &:hover {
+    color: #2cc0ff;
+  }
+}
+
+// Styles spécifiques pour les petits écrans (Mobile et Tablette)
+@media (max-width: 768px) {
+  .burger-icon {
+    display: block; // Affiche le burger sur mobile et tablette
+    font-size: 30px;
+    z-index: 20;
+    position: absolute; // Positionne le burger en haut à droite
+    right: 20px; // Burger aligné à droite
+    top: 15px; // Distance du bord supérieur
+  }
+
+  .navbar-links-container {
+    position: fixed; // Utilise `fixed` pour éviter que le menu soit affecté par les autres éléments
+    top: 0;
+    right: 0; // Le menu apparaît à droite
+    background: #000f2f;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: none; // Par défaut, le menu est caché
+    z-index: 14;
+    width: 30%; // Réduit la largeur du menu
+    height: 15vh; // Menu prend toute la hauteur de l'écran
+    // border-radius: 0
+    border-radius: 10px 0 0 10px;
+  }
+
+  .navbar-links-container.open {
+    display: flex; // Affiche le menu lorsque 'open' est activé
+  }
+
+  .close-icon {
+    font-size: 30px;
+    color: white;
+    cursor: pointer;
+    position: absolute; // Fixe la croix en haut à droite du menu
+    top: 20px; // Distance du bord supérieur
+    right: 20px; // Distance du bord droit
+    z-index: 16; // La croix est au-dessus du menu
+  }
+
+  // Cache les liens desktop par défaut sur mobile
+  .navbar-links-container:not(.open) {
+    display: none;
+  }
+
+  .navbar-button {
+    border: none;
+    border-radius: none;
+  }
+}
+
+// Supprime le burger et le menu déroulant sur les écrans plus larges
+@media (min-width: 769px) {
+  .burger-icon {
+    display: none; // Masque le burger sur les écrans larges
+  }
+
+  .navbar-links-container {
+    display: flex; // Affiche le menu horizontalement
+    position: static; // Position statique sur grand écran
+    width: auto;
+    height: auto;
+    gap: 20px; // Espacement des liens
+  }
+}
