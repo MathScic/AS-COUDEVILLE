@@ -12,7 +12,7 @@ const Actualites = () => {
     const fetchActualites = async () => {
       try {
         const response = await fetch(
-          "http://localhost:1337/api/news-actus?populate=images"
+          "http://localhost:1337/api/news"
         ); // Remplace l'URL par celle de ton CMS
         const data = await response.json();
 

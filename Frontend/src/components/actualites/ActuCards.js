@@ -60,6 +60,8 @@ const ActuCards = () => {
         {posts.slice(0, 4).map((post) => {
           const { id, titre, description, date, images } = post; // Extraction des champs nécessaires
 
+          console.log(images); // Affiche les données des images
+
           // Vérification si l'image est présente et obtention de l'URL complète
           const imageUrl =
             images && images.length > 0
@@ -79,7 +81,7 @@ const ActuCards = () => {
                   className="card-image"
                 />
               ) : (
-                <div className="card-image">Image non disponible</div>
+                <p style={{ color: 'red' }}>Erreur : Image non disponible</p>
               )}
               <h2>{titre || "Titre non défini"}</h2>
               <p>{description || "Description non définie"}</p>
@@ -102,7 +104,7 @@ const ActuCards = () => {
                 className="card-image"
               />
             ) : (
-              <div className="card-image">Image non disponible</div>
+              <p style={{ color: 'red' }}>Erreur : Image non disponible</p>
             )}
             <h2>{posts[4].titre || "Titre non défini"}</h2>
             <p>{posts[4].description || "Description non définie"}</p>
@@ -140,7 +142,7 @@ const ActuCards = () => {
                 className="expanded-card-image"
               />
             ) : (
-              <div className="expanded-card-image">Image non disponible</div>
+              <p style={{ color: 'red' }}>Erreur : Image non disponible</p>
             )}
 
             <h2>{expandedPost.titre}</h2>

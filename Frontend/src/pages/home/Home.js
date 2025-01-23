@@ -22,7 +22,7 @@ const Home = () => {
     });
 
     // Récupérer les actualités depuis l'API
-    fetch("http://localhost:1337/api/news?populate=*") // Remplace l'URL par celle de ton CMS
+    fetch("http://localhost:1337/api/news") // Remplace l'URL par celle de ton CMS
       .then((response) => response.json())
       .then((data) => {
         if (data && data.data) {
