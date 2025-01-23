@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import "./ActuCards.scss"; // Assurez-vous d'importer le fichier SCSS
 
 const ActuCards = () => {
-  const [posts, setPosts] = useState([]); // Articles récupérés
+  const [posts, setPosts] = useState(null); // Articles récupérés
   const [error, setError] = useState(null); // Gestion des erreurs
   const [expandedPost, setExpandedPost] = useState(null); // État pour la carte agrandie
-  const [visibleCount, setVisibleCount] = useState(4); // Nombre de cartes visibles par défaut
+  const [showMore, setShowMore] = useState(false); // Pour gérer l'affichage de la 5ème carte
 
   useEffect(() => {
-    // Appel à l'API Strapi avec la bonne URL
+    // Appel à l'API Strapi avec la nouvelle route 'news'
     fetch("https://as-coudeville.onrender.com/api/news?populate=images")
       .then((response) => {
         if (!response.ok) {
@@ -18,21 +18,10 @@ const ActuCards = () => {
       })
       .then((data) => {
         console.log("Données récupérées :", data); // Affiche les données récupérées
-
         if (data && data.data && Array.isArray(data.data)) {
-          const formattedPosts = data.data.map((post) => ({
-            id: post.id,
-            titre: post.attributes?.titre || "Titre non défini", // Chaînage sécurisé
-            description:
-              post.attributes?.description || "Description non définie", // Chaînage sécurisé
-            date: post.attributes?.date || null, // Chaînage sécurisé
-            imageUrl: post.attributes?.images?.data?.[0]?.attributes?.url
-              ? `https://as-coudeville.onrender.com${post.attributes.images.data[0].attributes.url}`
-              : null, // Vérifie que l'URL de l'image existe
-          }));
-          setPosts(formattedPosts);
+          setPosts(data.data); // Stocke directement le tableau des articles
         } else {
-          setPosts([]); // Si aucune donnée, tableau vide
+          setPosts([]); // Sinon, on met un tableau vide
         }
       })
       .catch((error) => {
@@ -40,14 +29,6 @@ const ActuCards = () => {
         setError(error.message);
       });
   }, []);
-
-  const handleShowMore = () => {
-    setVisibleCount((prevCount) => prevCount + 1); // Augmente le nombre visible
-  };
-
-  const handleShowLess = () => {
-    setVisibleCount(4); // Réinitialise à 4 cartes
-  };
 
   const handleCardClick = (post) => {
     setExpandedPost(post); // Affiche la carte agrandie
@@ -57,54 +38,88 @@ const ActuCards = () => {
     setExpandedPost(null); // Ferme la carte agrandie
   };
 
-  // Gestion des erreurs
+  const handleShowMoreClick = () => {
+    setShowMore(true); // Affiche la 5ème carte
+  };
+
+  const handleShowLessClick = () => {
+    setShowMore(false); // Retourne à l'affichage des 4 premières cartes
+  };
+
   if (error) {
     return <p>Erreur : {error}</p>;
   }
 
-  // Vérifie si les posts sont disponibles
-  if (!posts.length) {
+  if (!posts || !Array.isArray(posts)) {
     return <p>Chargement en cours ou aucun article trouvé.</p>;
   }
 
   return (
     <div className="actu-cards">
       <div className="cards">
-        {posts.slice(0, visibleCount).map((post) => (
-          <div
-            key={post.id}
-            className="card-container"
-            onClick={() => handleCardClick(post)} // Ajoute un événement de clic sur chaque carte
-          >
-            {post.imageUrl ? (
+        {posts.slice(0, 4).map((post) => {
+          const { id, titre, description, date, images } = post; // Extraction des champs nécessaires
+
+          console.log(images); // Affiche les données des images
+
+          // Vérification si l'image est présente et obtention de l'URL complète
+          const imageUrl =
+            images && images.length > 0
+              ? `https://as-coudeville.onrender.com${images[0].url}` // URL de production
+              : "https://via.placeholder.com/150"; // Image par défaut si aucune image n'est trouvée
+
+          return (
+            <div
+              key={id}
+              className="card-container"
+              onClick={() => handleCardClick(post)} // Ajoute un événement de clic sur chaque carte
+            >
               <img
-                src={post.imageUrl}
-                alt={post.titre}
+                src={imageUrl}
+                alt={titre || "Image"}
                 className="card-image"
               />
-            ) : (
-              <p style={{ color: "red" }}>Erreur : Image non disponible</p>
-            )}
-            <h2>{post.titre}</h2>
-            <p>{post.description}</p>
+              <h2>{titre || "Titre non défini"}</h2>
+              <p>{description || "Description non définie"}</p>
+              <div className="card-date">
+                {date
+                  ? new Date(date).toLocaleDateString()
+                  : "Date non définie"}
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Affiche la 5ème carte si le bouton "Voir plus" est cliqué */}
+        {showMore && posts.length >= 5 && (
+          <div className="card-container">
+            <img
+              src={
+                posts[4].images && posts[4].images.length > 0
+                  ? `https://as-coudeville.onrender.com${posts[4].images[0].url}`
+                  : "https://via.placeholder.com/150" // Image par défaut si aucune image n'est trouvée
+              }
+              alt={posts[4].titre}
+              className="card-image"
+            />
+            <h2>{posts[4].titre || "Titre non défini"}</h2>
+            <p>{posts[4].description || "Description non définie"}</p>
             <div className="card-date">
-              {post.date
-                ? new Date(post.date).toLocaleDateString()
+              {posts[4].date
+                ? new Date(posts[4].date).toLocaleDateString()
                 : "Date non définie"}
             </div>
           </div>
-        ))}
+        )}
       </div>
 
       {/* Bouton pour voir plus ou moins */}
-      {posts.length > visibleCount && (
-        <button className="showmore-btn" onClick={handleShowMore}>
-          Voir plus
-        </button>
-      )}
-      {visibleCount > 4 && (
-        <button className="showmore-btn" onClick={handleShowLess}>
-          Voir moins
+      {posts.length > 4 && (
+        <button
+          className="showmore-btn"
+          onClick={showMore ? handleShowLessClick : handleShowMoreClick}
+        >
+          {showMore ? "Voir moins" : "Voir plus"}
         </button>
       )}
 
@@ -116,16 +131,15 @@ const ActuCards = () => {
             onClick={(e) => e.stopPropagation()} // Empêche la propagation du clic sur la card
           >
             {/* Image agrandie */}
-            {expandedPost.imageUrl ? (
-              <img
-                src={expandedPost.imageUrl}
-                alt={expandedPost.titre}
-                className="expanded-card-image"
-              />
-            ) : (
-              <p style={{ color: "red" }}>Erreur : Image non disponible</p>
-            )}
-
+            <img
+              src={
+                expandedPost.images && expandedPost.images.length > 0
+                  ? `https://as-coudeville.onrender.com${expandedPost.images[0].url}`
+                  : "https://via.placeholder.com/150" // Image par défaut si aucune image n'est trouvée
+              }
+              alt={expandedPost.titre}
+              className="expanded-card-image"
+            />
             <h2>{expandedPost.titre}</h2>
             <p>{expandedPost.description}</p>
             <div className="card-date">

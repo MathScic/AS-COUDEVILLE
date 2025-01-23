@@ -31,26 +31,26 @@ const Home = () => {
         return response.json();
       })
       .then((data) => {
-        if (data && data.data) {
-          // Formatage des actualités avec les images et autres informations
+        if (data?.data && Array.isArray(data.data)) {
+          // On s'assure que les données existent et qu'elles sont sous forme de tableau
           const sortedActualites = data.data
             .map((item) => ({
               id: item.id,
-              titre: item.attributes.titre,
-              description: item.attributes.description,
-              date: item.attributes.date,
-              imageUrl: item.attributes.images?.data?.[0]?.attributes?.url
+              titre: item?.attributes?.titre || "Titre non défini",
+              description:
+                item?.attributes?.description || "Description non définie",
+              date: item?.attributes?.date || "Date non définie",
+              imageUrl: item?.attributes?.images?.data?.[0]?.attributes?.url
                 ? `https://as-coudeville.onrender.com${item.attributes.images.data[0].attributes.url}`
                 : "", // Si pas d'image, on laisse une chaîne vide
             }))
             .sort((a, b) => new Date(b.date) - new Date(a.date)); // Trie par date décroissante
 
-          // Limiter à 4 actualités les plus récentes
-          const limitedActualites = sortedActualites.slice(0, 4);
+          const limitedActualites = sortedActualites.slice(0, 4); // Limite à 4 actualités
 
           setActualites(limitedActualites); // Mettre à jour les actualités
         } else {
-          setActualites([]);
+          setActualites([]); // Si aucune donnée
         }
       })
       .catch((error) => {

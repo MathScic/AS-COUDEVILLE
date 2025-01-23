@@ -12,40 +12,24 @@ const Actualites = () => {
     const fetchActualites = async () => {
       try {
         const response = await fetch(
-          "https://as-coudeville.onrender.com/api/news?populate=images" // Ajoute `populate=images` pour récupérer les images
-        );
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP : ${response.status}`);
-        }
+          "https://as-coudeville.onrender.com/api/news?populate=images"
+        ); // Remplace l'URL par celle de ton CMS
+        const data = await response.json();
 
-        const result = await response.json();
-
-        // Récupérer les actualités depuis "data"
-        const actualitesData = result.data.map((item) => ({
-          id: item.id,
-          titre: item.attributes.titre,
-          description: item.attributes.description,
-          date: item.attributes.date,
-          createdAt: item.attributes.createdAt,
-          imageUrl: item.attributes.images?.data?.[0]?.attributes?.url
-            ? `https://as-coudeville.onrender.com${item.attributes.images.data[0].attributes.url}`
-            : null, // Récupérer l'URL de l'image
-        }));
-
-        // Trier par date de création (createdAt)
-        const sortedActualites = actualitesData.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        // Trier les actualités par date (de la plus récente à la plus ancienne)
+        const sortedActualites = data.actualites.sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
         );
 
-        setActualites(sortedActualites); // Mettre à jour l'état avec les actualités triées
+        setActualites(sortedActualites); // On met à jour les actualités
+        setLoading(false); // Fin du chargement
       } catch (error) {
-        console.error("Erreur lors du chargement des actualités :", error);
-      } finally {
-        setLoading(false); // Terminer le chargement
+        console.error("Erreur de récupération des actualités", error);
+        setLoading(false); // Fin du chargement
       }
     };
 
-    fetchActualites();
+    fetchActualites(); // Récupérer les actualités depuis l'API
   }, []);
 
   // Fonction pour afficher plus de cartes
@@ -75,10 +59,10 @@ const Actualites = () => {
       </p>
       <div className="content">
         <div className="actu-cards-container">
-          {/* Passer les actualités triées au composant ActuCards */}
+          {/* Afficher les cartes sélectionnées */}
           <ActuCards actualites={actualitesToDisplay} />
 
-          {/* Boutons pour afficher plus ou moins */}
+          {/* Affichage du bouton Voir plus/voir moins */}
           {actualites.length > 4 && (
             <div className="voir-plus-button">
               {visibleCount > 4 ? (
