@@ -1,13 +1,12 @@
-import path from "path";
-
 export default ({ env }) => {
-  const client = env("DATABASE_CLIENT", "postgres"); // Utiliser "postgres"
+  const client = env("DATABASE_CLIENT", "postgres");
 
   const connections = {
     postgres: {
       connection: {
-        connectionString: env("DATABASE_URL"), // Utiliser la variable d'environnement DATABASE_URL
-        ssl: env.bool("DATABASE_SSL", true) && {
+        connectionString: env("DATABASE_URL"), // Connexion via DATABASE_URL
+        ssl: {
+          require: true, // Obligatoire pour Render
           rejectUnauthorized: env.bool(
             "DATABASE_SSL_REJECT_UNAUTHORIZED",
             false
@@ -18,17 +17,6 @@ export default ({ env }) => {
         min: env.int("DATABASE_POOL_MIN", 2),
         max: env.int("DATABASE_POOL_MAX", 10),
       },
-    },
-    sqlite: {
-      connection: {
-        filename: path.join(
-          __dirname,
-          "..",
-          "..",
-          env("DATABASE_FILENAME", ".tmp/data.db")
-        ),
-      },
-      useNullAsDefault: true,
     },
   };
 
